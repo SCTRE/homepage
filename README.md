@@ -2,11 +2,10 @@
 
 > [!IMPORTANT]
 > ## 致大家
-> 此项目最初只是一个简单的主页。然而，随着越来越多的小伙伴发现了这个项目，它受到了大量本不应有的关注。而且，此项目作为初学前端的作品，其代码相当杂乱且质量低下。此外，该项目还遭到众多不明资源站或下载站的倒卖，致使许多不明真相的购买者从源代码中找到本人的联系方式进行问题咨询或提出功能需求。但由于目前个人生活方面的原因，且本人未曾从此项目获取任何收益，所以已无力维护此项目。该仓库不会存档，会积极接受各位大佬的 PR，不过不会针对任何新功能或 Bug 做出更新，敬请谅解！
+> 嘿！恭喜你看到这里~ 这是酪灰基于原作者 imsyy 主页的修改版本！修改版本添加了更多的功能，但是也会带来更高的性能占用！（主要来自逐字歌词以及季节效果渲染），也添加了安全更新，增强安全性。酪灰作为 Vue 初学者，因为热爱，拉着同学 Pizero 完善了这个项目，因此这些代码会很 shi，并可能充斥着不少 BUG。欢迎在遇到 BUG 时进行反馈，也欢迎各位大佬帮助！
 
 <p>
 <strong><h2>無名の主页</h2></strong>
-简单的小主页，原来的看够了，重新弄了一个
 </p>
 
 ![無名の主页](/screenshots/main.jpg)
@@ -15,11 +14,17 @@
 
 ### 👀 Demo
 
-> 由于 CDN 缓存原因，查看最新效果可能需要 `Ctrl` + `F5` 强制刷新浏览器缓存
+> 由于 workbox 缓存原因，查看最新效果可能需要 `Ctrl` + `F5` 强制刷新浏览器缓存噢！
 
 - [無名の主页](https://www.imsyy.top)
-- [無名の主页 - Dev](https://home-imsyy.vercel.app)
-- [無名の主页 - 备用线路](https://home-5iw.pages.dev)
+- [酪灰の主页](https://nanorocky.top/)
+
+> 如果您的项目不需要 workbox 的本地缓存，比如有 CDN 的情况下，或者是遇到访问子路径自动跳转主页的情况，可以取消注释 `vite.config.js` 内的两行代码：
+
+```bash
+selfDestroying: true,
+injectRegister: false,
+```
 
 ### 🎉 功能
 
@@ -48,8 +53,8 @@
 
 - **安装** [node.js](https://nodejs.org/zh-cn/) **环境**
 
-  > node > 16.16.0  
-  > npm > 8.15.0
+  > node > 22.14.0
+  > npm > 11.1.0
 
 - 然后以 **管理员权限** 运行 `cmd` 终端，并 `cd` 到 项目根目录
 - 在 `终端` 中输入：
@@ -146,21 +151,23 @@ const siteIcon = {
 
 ### 音乐
 
-> 本项目采用了基于 `MetingJS` 的 `Aplayer` 音乐播放器，可实现快速自定义歌单  
+> 本项目采用了基于 `MetingJS` 的 `Aplayer` 音乐播放器，可实现快速自定义歌单
 > \*仅支持 **中国大陆地区**
 
 请在 `.env` 文件中更改歌曲相关参数即可实现自定义歌单列表
 
 ```bash
-# 歌曲 API 地址
-VITE_SONG_API = "https://api-meting.imsyy.top"
+# 歌曲 API 地址 （强烈建议自行搭建 Meting-Api）
+VITE_SONG_API = "https://metingapi.nanorocky.top/"
 # 歌曲服务器 ( netease-网易云, tencent-qq音乐 )
 VITE_SONG_SERVER = "netease"
 # 播放类型 ( song-歌曲, playlist-播放列表, album-专辑, search-搜索, artist-艺术家 )
 VITE_SONG_TYPE = "playlist"
 # 播放 ID
-VITE_SONG_ID = "7452421335"
+VITE_SONG_ID = "3035221869"
 ```
+
+如果需要使用网易云音乐逐字歌词，请使用 [修改版 Meting-Api](https://github.com/NanoRocky/meting-api) ！
 
 ### 字体
 
@@ -211,18 +218,42 @@ make clean all
 
 可以在 `public/images` 中修改网站背景
 
-如果想要添加更多的本地图片作为网站背景，可以将图片重命名 `background+数字` 的形式，并在 `src/components/Background/index.vue` 中进行修改：
+如果想要添加更多的本地图片作为网站背景，可以将图片重命名 `background+数字` 的形式，并进行修改：
+
+· 先编辑 `src/components/Background/index.vue`
+```js
+// 设置一个默认值，防止在无法加载 JSON 文件时壁纸失效。应该尽量保证壁纸数始终不小于这个默认值
+let bgImageCount = 10; // PC 版壁纸
+let bgImageCountP = 2; // 移动版壁纸
+```
+
+· 再编辑 `public/images/config.json`
+```js
+{
+  "bgImageCount": 10, // PC 版壁纸
+  "bgImageCountP": 2 // 移动版壁纸
+}
+```
+后续添加或减少壁纸，可直接编辑 `config.json` ，而无需重新编译项目。但必须确保壁纸数始终大于或等于 `index.vue` 中的配置。
+
+如需配置默认壁纸选项，请编辑 `src/store/index.js`
 
 ```js
-if (type == 0) {
-  // 修改此处 Math.random() 后面的第一个数字为图片的数量
-  bgUrl.value = `/images/background${Math.floor(Math.random() * 10 + 1)}.webp`;
-}
+coverType: "0", // 壁纸种类
 ```
 
 #### 网站图标
 
 可以在 `public/images/icon` 中修改网站图标。
+
+#### 语音交互
+
+语音交互区分 预生成 与 实时生成。
+  预生成的语音需要提前生成并放在 `public/speechlocal/` 路径下，替换原有音频。预生成的音频是为固定不变的通知设计的，有更低的语音延迟（推荐使用 CDN 或对音频文件启用客户端缓存）。
+  实时生成的语音用于音乐播放器歌名播报，需自行搭建并填写在 `.env` 内。如果也使用 Azure ，您可直接使用 https://github.com/NanoRocky/AzureSpeechAPI-by-PHP 完成 API 部署。
+#### 更多默认设置
+
+自动播放，逐字开关，语音交互开关 等其它默认设置，请编辑 `src/store/index.js` ，但这些设置仅对编辑后首次打开网页的用户生效，覆盖用户设置需要清除网页数据
 
 ### 技术栈
 
