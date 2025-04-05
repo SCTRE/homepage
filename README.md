@@ -54,6 +54,7 @@ injectRegister: false,
 - **安装** [node.js](https://nodejs.org/zh-cn/) **环境**
 
   > node > 22.14.0
+
   > npm > 11.1.0
 
 - 然后以 **管理员权限** 运行 `cmd` 终端，并 `cd` 到 项目根目录
@@ -245,11 +246,11 @@ coverType: "0", // 壁纸种类
 
 [![Star History Chart](https://api.star-history.com/svg?repos=imsyy/home&type=Date)](https://star-history.com/#imsyy/home&Date)
 
-### 特别鸣谢
+## 特别鸣谢
 - [AMLL TTML Database](https://github.com/Steve-xmh/amll-ttml-db)
 - [Meting API](https://github.com/injahow/meting-api)
 
-## 感谢原作者 imsyy 和帮助本项目的小伙伴们！
+### 感谢原作者 imsyy 和帮助本项目的小伙伴们！
 - [imsyy](https://github.com/imsyy/)
 - [这个哔养得](https://github.com/pizeroLOL/)
 
