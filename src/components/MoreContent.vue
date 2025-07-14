@@ -2,6 +2,9 @@
   <div class="more-content">您可在此编写任意内容</div>
 </template>
 
+<script setup lang="ts">
+</script>
+
 <style lang="scss" scoped>
 .more-content {
   display: flex;

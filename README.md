@@ -2,24 +2,25 @@
 
 > [!IMPORTANT]
 > ## 致大家
-> 嘿！恭喜你看到这里~ 这是酪灰基于原作者 imsyy 主页的修改版本！修改版本添加了更多的功能，但是也会带来更高的性能占用！（主要来自逐字歌词以及季节效果渲染），也添加了安全更新，增强安全性。
-> 酪灰作为 Vue 初学者，因为热爱，拉着同学 Pizero 完善了这个项目，因此这些代码会很 shi，并可能充斥着不少 BUG。欢迎在遇到 BUG 时进行反馈，也欢迎各位大佬帮助！
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;嘿！恭喜你看到这里~ 这是酪灰基于原作者 imsyy 主页的修改版本！修改版本添加了更多的功能，但是也会带来更高的性能占用！（主要来自逐字歌词以及季节效果渲染），也添加了安全更新，增强安全性。<p>
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;酪灰作为 Vue 初学者，因为热爱，拉着同学 Pizero 完善了这个项目，因此这些代码可能会很 shi，并可能充斥着不少 BUG。欢迎在遇到 BUG 时进行反馈，也欢迎各位大佬帮助！<p>
+>#### 关于问题反馈以及求助
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;遇到问题请在 Github 上提 issue ，需要帮助请在 Github 上发 discussion ，看到了会回复。除特殊情况外，<b>请不要直接通过其它社交方式联系酪灰！</b>酪灰不是客服，不提供售后服务，并没有那么多的时间来回复私聊。还请谅解！<p>
+>### 最后，喜欢本项目的话麻烦给个 STAR ！阿里嘎多~
 
-<p>
+<p>&nbsp;<p>
 <strong><h2>無名の主页</h2></strong>
 </p>
 
-![無名の主页](/screenshots/main.jpeg)
-
-> 主页的 Logo 字体已经过压缩，若用本站 Logo 以外的字母会变回默认字体，这里是 [完整字体](https://raw.githubusercontent.com/googlefonts/Pacifico/main/fonts/ttf/Pacifico-Regular.ttf)，若无法下载，可将字体目录下的 `Pacifico-Regular-all.ttf` 进行替换
+![無名の主页](/screenshots/main.png)
 
 ### 👀 Demo
 
-> 由于 workbox 缓存原因，查看最新效果可能需要 `Ctrl` + `F5` 强制刷新浏览器缓存噢！
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;由于 workbox 缓存原因，查看最新效果可能需要 `Ctrl` + `F5` 强制刷新浏览器缓存噢！
 
 - [酪灰の主页](https://nanorocky.top/)
 
-> 【小贴士】如果您的项目不需要 workbox 的本地缓存，比如有 CDN 的情况下，或者是遇到访问子路径自动跳转主页的情况，可以取消注释 `vite.config.js` 内的两行代码：
+> 【小贴士】如果您的项目不需要 workbox 的本地缓存，比如有 CDN 的情况下，或者是遇到访问子路径自动跳转主页的情况，可以取消注释 `vite.config.ts` 内的两行代码：
 
 ```bash
 selfDestroying: true,
@@ -36,6 +37,7 @@ injectRegister: false,
 - [x] 时光进度条
 - [x] 音乐播放器
 - [x] 移动端适配
+- [x] 逐字歌词兼容
 
 ### ⚙️ 自动部署
 
@@ -53,11 +55,10 @@ injectRegister: false,
 
 - **安装** [node.js](https://nodejs.org/zh-cn/) **环境**
 
-  > node > 22.14.0
+  > node > 22.17.0 <p>
+  > npm > 10.9.2
 
-  > npm > 11.1.0
-
-- 然后以 **管理员权限** 运行 `cmd` 终端，并 `cd` 到 项目根目录
+- 然后以 **管理员权限** 运行 `PowerShell` 终端，并 `cd` 到 项目根目录
 - 在 `终端` 中输入：
 
 ```bash
@@ -104,7 +105,7 @@ docker run -p 12445:12445 -d home
 {
   "icon": "Blog",
   "name": "博客",
-  "link": "https://blog.imsyy.top/"
+  "link": "https://blog.your.domain/"
 },
 ```
 
@@ -163,18 +164,21 @@ const siteIcon = {
 VITE_SONG_API = "https://metingapi.nanorocky.top/"
 # 歌曲服务器 ( netease-网易云, tencent-qq音乐 )
 VITE_SONG_SERVER = "netease"
+VITE_SONG_SERVER_SECOND = "tencent"
 # 播放类型 ( song-歌曲, playlist-播放列表, album-专辑, search-搜索, artist-艺术家 )
 VITE_SONG_TYPE = "playlist"
 # 播放 ID
 VITE_SONG_ID = "3035221869"
+VITE_SONG_ID_SECOND = "9518088898"
 ```
-
-如果需要使用网易云音乐逐字歌词，请使用 [修改版 Meting-Api](https://github.com/NanoRocky/meting-api) ！
+>目前已支持设置两个歌单进行合并，如不需要，留空即可。<p>
+>如果需要使用网易云音乐逐字歌词，请使用 [修改版 Meting-Api](https://github.com/NanoRocky/meting-api/) ！<p>
 
 ### 字体
 
-现采用 `HarmonyOS Sans` 开源字体，采用字体拆分，提升加载速度
+现采用 `MiSans` and `HarmonyOS Sans` 字体，采用字体拆分，提升加载速度。
 
+> `https://cdn-font.hyperos.mi.com/font/css?family=MiSans_VF:VF:Chinese_Simplify,Latin&display=swap` <p>
 > `https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css`
 
 
@@ -182,18 +186,18 @@ VITE_SONG_ID = "3035221869"
 
 #### 网站背景
 
-可以在 `public/images` 中修改网站背景
+可以在 `public/images` 中修改网站背景。<p>
 
-如果想要添加更多的本地图片作为网站背景，可以将图片重命名 `background+数字` 的形式，并进行修改：
+如果想要添加更多的本地图片作为网站背景，可以将图片重命名 `background+数字` 的形式，并进行修改：<p>
 
-· 先编辑 `src/components/Background/index.vue`
+>· 先编辑 `src/components/Background/index.vue`
 ```js
 // 设置一个默认值，防止在无法加载 JSON 文件时壁纸失效。应该尽量保证壁纸数始终不小于这个默认值
 let bgImageCount = 10; // PC 版壁纸
 let bgImageCountP = 2; // 移动版壁纸
 ```
 
-· 再编辑 `public/images/config.json`
+>· 再编辑 `public/images/config.json`
 ```js
 {
   "bgImageCount": 10, // PC 版壁纸
@@ -214,13 +218,13 @@ coverType: "0", // 壁纸种类
 
 #### 语音交互
 
-语音交互区分 预生成 与 实时生成。
-  预生成的语音需要提前生成并放在 `public/speechlocal/` 路径下，替换原有音频。预生成的音频是为固定不变的通知设计的，有更低的语音延迟（推荐使用 CDN 或对音频文件启用客户端缓存）。
-  实时生成的语音用于音乐播放器歌名播报，需自行搭建并填写在 `.env` 内。如果也使用 Azure ，您可直接使用 https://github.com/NanoRocky/AzureSpeechAPI-by-PHP 完成 API 部署。
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;语音交互区分 预生成 与 实时生成。<p>
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;预生成的语音需要提前生成并放在 `public/speechlocal/` 路径下，替换原有音频。预生成的音频是为固定不变的通知设计的，有更低的语音延迟（推荐使用 CDN 或对音频文件启用客户端缓存）。<p>
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;实时生成的语音用于音乐播放器歌名播报，需自行搭建并填写在 `.env` 内。如果也使用 Azure ，您可直接使用[AzureSpeechAPI-by-PHP](https://github.com/NanoRocky/AzureSpeechAPI-by-PHP) 完成 API 部署。
 
 #### 更多默认设置
 
-自动播放，逐字开关，语音交互开关 等其它默认设置，请编辑 `src/store/index.js` ，但这些设置仅对编辑后首次打开网页的用户生效，覆盖用户设置需要清除网页数据
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;自动播放，逐字开关，语音交互开关 等其它默认设置，请编辑 `src/store/index.js` ，但这些设置仅对编辑后首次打开网页的用户生效，覆盖用户设置需要清除网页数据
 
 ### 技术栈
 
@@ -229,6 +233,7 @@ coverType: "0", // 壁纸种类
 - [Pinia](https://pinia.vuejs.org/zh/)
 - [IconPark](https://iconpark.oceanengine.com/official)
 - [xicons](https://xicons.org/)
+- [TypeScript](https://www.typescriptlang.org/zh/)
 - [Aplayer](https://aplayer.js.org/)
 
 ### API
@@ -254,4 +259,4 @@ coverType: "0", // 壁纸种类
 - [imsyy](https://github.com/imsyy/)
 - [这个哔养得](https://github.com/pizeroLOL/)
 
-<a title="SSL" target="_blank" href="https://myssl.com/seal/detail?domain=blog.imsyy.top"><img src="https://img.shields.io/badge/MySSL-安全认证-brightgreen"></a>&nbsp;<a title="CDN" target="_blank" href="https://cdnjs.com/"><img src="https://img.shields.io/badge/CDN-Cloudflare-blue"></a>&nbsp;<a title="Copyright" target="_blank" href="https://imsyy.top/"><img src="https://img.shields.io/badge/Copyright%20%C2%A9%202020--2023-%E7%84%A1%E5%90%8D-red"></a>
+<a title="SSL" target="_blank" href="https://myssl.com/seal/detail?domain=nanorocky.top"><img src="https://img.shields.io/badge/MySSL-安全认证-brightgreen"></a>&nbsp;<a title="CDN" target="_blank" href="https://cdnjs.com/"><img src="https://img.shields.io/badge/CDN-Cloudflare-blue"></a>&nbsp;<a title="CDN2" target="_blank" href="https://cdnjs.com/"><img src="https://img.shields.io/badge/CDN-Tencent EdgeOne-blue"></a>&nbsp;<a title="Copyright" target="_blank" href="https://imsyy.top/"><img src="https://img.shields.io/badge/Copyright%20%C2%A9%202023--2025-酪灰-red"></a>

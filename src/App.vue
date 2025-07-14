@@ -29,7 +29,7 @@
   </Transition>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { helloInit, checkDays } from "@/utils/getTime.js";
 import { HamburgerButton, CloseSmall } from "@icon-park/vue-next";
 import { mainStore } from "@/store";
@@ -66,7 +66,7 @@ const loadComplete = () => {
 watch(
   () => store.innerWidth,
   (value) => {
-    if (value < 721) {
+    if (value != null && value < 721) {
       store.boxOpenState = false;
       store.setOpenState = false;
     }
@@ -149,14 +149,14 @@ onBeforeUnmount(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  transform: scale(1.2);
+  // transform: scale(1.2);
   transition: transform 0.3s;
   animation: fade-blur-main-in 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   animation-delay: 0.5s;
 
   .container {
     width: 100%;
-    height: 100vh;
+    height: 100%;
     margin: 0 auto;
     padding: 0 0.5vw;
 
@@ -168,6 +168,7 @@ onBeforeUnmount(() => {
       flex-direction: row;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
     }
 
     .more {
@@ -183,8 +184,9 @@ onBeforeUnmount(() => {
       animation: fade 0.5s;
     }
 
+
     @media (max-width: 1200px) {
-      padding: 0 2vw;
+      padding: 0;
     }
   }
 
@@ -217,85 +219,26 @@ onBeforeUnmount(() => {
     }
   }
 
-  @media (max-height: 720px) {
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    .container {
-      height: 721px;
-
-      .more {
-        height: 721px;
-        width: calc(100% + 6px);
-      }
-
-      @media (min-width: 391px) {
-        // w 1201px ~ max
-        padding-left: 0.7vw;
-        padding-right: 0.25vw;
-
-        @media (max-width: 1200px) {
-          // w 1101px ~ 1280px
-          padding-left: 2.3vw;
-          padding-right: 1.75vw;
-        }
-
-        @media (max-width: 1100px) {
-          // w 993px ~ 1100px
-          padding-left: 2vw;
-          padding-right: calc(2vw - 6px);
-        }
-
-        @media (max-width: 992px) {
-          // w 901px ~ 992px
-          padding-left: 2.3vw;
-          padding-right: 1.7vw;
-        }
-
-        @media (max-width: 900px) {
-          // w 391px ~ 900px
-          padding-left: 2vw;
-          padding-right: calc(2vw - 6px);
-        }
-      }
-    }
-
-    .menu {
-      top: 605.64px; // 721px * 0.84
-      left: 170.5px; // 391 * 0.5 - 25px
-
-      @media (min-width: 391px) {
-        left: calc(50% - 25px);
-      }
-    }
-
-    .f-ter {
-      top: 675px; // 721px - 46px
-
-      @media (min-width: 391px) {
-        padding-left: 6px;
-      }
-    }
-  }
-
-  @media (max-width: 390px) {
+  @media (max-width: 360px) {
     overflow-x: auto;
+    overflow: hidden;
 
     .container {
-      width: 391px;
+      width: 360px;
     }
 
     .menu {
-      left: 167.5px; // 391px * 0.5 - 28px
+      left: calc(360px * 0.5 - 28px);
     }
 
     .f-ter {
-      width: 391px;
+      width: 360px;
     }
 
     @media (min-height: 721px) {
       overflow-y: hidden;
     }
   }
+
 }
 </style>

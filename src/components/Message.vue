@@ -29,7 +29,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { Icon } from "@vicons/utils";
 import { QuoteLeft, QuoteRight } from "@vicons/fa";
 import { Error } from "@icon-park/vue-next";
@@ -59,11 +59,11 @@ const descriptionText = reactive({
 
 // 切换右侧功能区
 const changeBox = () => {
-  if (store.getInnerWidth >= 721) {
+  if ((store.getInnerWidth ?? 0) >= 721) {
     store.boxOpenState = !store.boxOpenState;
   } else {
     ElMessage({
-      message: "当前页面宽度不足以开启盒子",
+      message: "当前显示分辨率不足以打开拓展盒子啦qwq【这么“小”还想开impart！（bushi）】",
       grouping: true,
       icon: h(Error, {
         theme: "filled",
@@ -99,6 +99,7 @@ watch(
   },
 );
 </script>
+
 
 <style lang="scss" scoped>
 .message {

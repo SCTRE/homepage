@@ -28,7 +28,8 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { getCurrentTime } from "@/utils/getTime";
 import { mainStore } from "@/store";
 import Music from "@/components/Music.vue";
@@ -37,25 +38,45 @@ import Weather from "@/components/Weather.vue";
 
 const store = mainStore();
 
+interface CurrentTime {
+  year: number;
+  month: number;
+  day: number;
+  weekday: string;
+  hour: number;
+  minute: number;
+  second: number;
+};
+
 // 当前时间
-const currentTime = ref({});
-const timeInterval = ref(null);
+const currentTime = ref < CurrentTime > ({
+  year: 0,
+  month: 0,
+  day: 0,
+  weekday: "",
+  hour: 0,
+  minute: 0,
+  second: 0,
+});
+const timeInterval = ref < number | null > (null);
 
 // 播放器 id
 const playerHasId = import.meta.env.VITE_SONG_ID;
 
 // 更新时间
 const updateTimeData = () => {
-  currentTime.value = getCurrentTime();
+  Object.assign(currentTime.value, getCurrentTime());
 };
 
 onMounted(() => {
   updateTimeData();
-  timeInterval.value = setInterval(updateTimeData, 1000);
+  timeInterval.value = setInterval(updateTimeData, 1000) as unknown as number;
 });
 
 onBeforeUnmount(() => {
-  clearInterval(timeInterval.value);
+  if (timeInterval.value !== null) {
+    clearInterval(timeInterval.value);
+  };
 });
 </script>
 

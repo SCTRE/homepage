@@ -11,17 +11,23 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="js">
 import { mainStore } from "@/store";
 import { Error } from "@icon-park/vue-next";
 import { Speech, stopSpeech, SpeechLocal } from "@/utils/speech";
-import initSnowfall from "@/utils/season/snow";
-import initFirefly from "@/utils/season/firefly";
+import { initSnowfall, closeSnowfall } from "@/utils/season/snow";
+import { initFirefly, closeFirefly } from "@/utils/season/firefly";
+import { initLantern, closeLantern } from "@/utils/season/lantern";
+import { ref, h } from 'vue';
+import { gasC } from "@/utils/authServer";
+
 
 const store = mainStore();
 const bgUrl = ref(null);
 const imgTimeout = ref(null);
 const emit = defineEmits(["loadComplete"]);
+const key = import.meta.env.VITE_SFILE_SKEY;
+const isLoading = ref(false);
 
 // 自定义壁纸
 // 酪灰的小批注：这里增加了从配置文件读取壁纸数的功能，使得在增加壁纸时不需要重新编译项目，只需修改这个 json 文件内的值
@@ -30,21 +36,40 @@ let bgImageCount = 10; // PC 版壁纸
 let bgImageCountP = 2; // 移动版壁纸
 let bgRandom = 0;
 let bgRandomp = 0;
+let confUrlS = null;
 let sest = 0;
+let sBGCountN = null;
 
 // 加载 config.json
 async function loadConfig() {
   try {
-    const response = await fetch('/images/config.json');
+    if (key) {
+      const confUrl = "/images/config.json";
+      confUrlS = await gasC(confUrl, key);
+    } else {
+      confUrlS = "/images/config.json";
+    };
+    const response = await fetch(confUrlS);
     const data = await response.json();
     bgImageCount = Math.max(data.bgImageCount, 1);
     bgImageCountP = Math.max(data.bgImageCountP, 1);
-    bgRandom = Math.floor(Math.random() * bgImageCount + 1);
-    bgRandomp = Math.floor(Math.random() * bgImageCountP + 1);
+    if (sBGCountN != null && sBGCountN <= bgImageCount && sBGCountN > 0) {
+      bgRandom = sBGCountN;
+      bgRandomp = sBGCountN;
+      sBGCountN = null;
+      return true;
+    } else {
+      bgRandom = Math.floor(Math.random() * bgImageCount + 1);
+      bgRandomp = Math.floor(Math.random() * bgImageCountP + 1);
+      sBGCountN = null;
+      return true;
+    };
   } catch (error) {
     console.error('无法加载壁纸配置文件:', error);
     bgRandom = Math.floor(Math.random() * bgImageCount + 1);
     bgRandomp = Math.floor(Math.random() * bgImageCountP + 1);
+    sBGCountN = null;
+    return true;
   };
 };
 
@@ -63,27 +88,49 @@ const detectDevice = () => {
 };
 
 // 更换壁纸链接
-const changeBg = (type) => {
+const changeBg = async (type) => {
+  if (isLoading.value) return;
+  isLoading.value = true;
   (async () => {
-    await loadConfig(); // 加载配置文件
-    const deviceType = detectDevice(); // 加载设备类型
-    if (type == 0) {
-      // 这里指定了所有自定义背景的文件格式，必须统一。可以自定义修改，比如 webp 或 png
-      // 酪灰的小批注：这里添加了设备类型识别以加载不同分辨率的壁纸
-      // 如果不需要区分设备类型，则只需要保留这一行 bgUrl.value = `/images/background${bgRandom}.jpg`;
-      if (deviceType === 'mobile') {
-        bgUrl.value = `/images/phone/backgroundphone${bgRandomp}.jpg`;
-      } else if (deviceType === 'tablet' || deviceType === 'pc') {
-        bgUrl.value = `/images/background${bgRandom}.jpg`;
-      } else {
-        bgUrl.value = `/images/background${bgRandom}.jpg`;
+    try {
+      const configLoaded = await loadConfig();
+      const deviceType = await detectDevice();
+      if (!configLoaded) return;
+      if (type == 0) {
+        // 这里指定了所有自定义背景的文件格式，必须统一。可以自定义修改，比如 webp 或 png
+        // 酪灰的小批注：这里添加了设备类型识别以加载不同分辨率的壁纸
+        // 如果不需要区分设备类型，则只需要保留这一行 bgUrl.value = `/images/background${bgRandom}.jpg`;
+        if (deviceType === 'mobile') {
+          if (key) {
+            const bgUrlS = `/images/phone/backgroundphone${bgRandomp}.jpg`;
+            bgUrl.value = await gasC(bgUrlS, key);
+          } else {
+            bgUrl.value = `/images/phone/backgroundphone${bgRandomp}.jpg`;
+          };
+        } else if (deviceType === 'tablet' || deviceType === 'pc') {
+          if (key) {
+            const bgUrlS = `/images/background${bgRandom}.jpg`;
+            bgUrl.value = await gasC(bgUrlS, key);
+          } else {
+            bgUrl.value = `/images/background${bgRandom}.jpg`;
+          };
+        } else {
+          if (key) {
+            const bgUrlS = `/images/background${bgRandom}.jpg`;
+            bgUrl.value = await gasC(bgUrlS, key);
+          } else {
+            bgUrl.value = `/images/background${bgRandom}.jpg`;
+          };
+        };
+      } else if (type == 1) {
+        bgUrl.value = "https://api.dujin.org/bing/1920.php";
+      } else if (type == 2) {
+        bgUrl.value = "https://api.vvhan.com/api/wallpaper/views";
+      } else if (type == 3) {
+        bgUrl.value = "https://api.vvhan.com/api/wallpaper/acg";
       };
-    } else if (type == 1) {
-      bgUrl.value = "https://api.dujin.org/bing/1920.php";
-    } else if (type == 2) {
-      bgUrl.value = "https://api.vvhan.com/api/wallpaper/views";
-    } else if (type == 3) {
-      bgUrl.value = "https://api.vvhan.com/api/wallpaper/acg";
+    } finally {
+      isLoading.value = false;
     };
   })();
 };
@@ -106,7 +153,7 @@ const imgAnimationEnd = () => {
 };
 
 // 图片显示失败
-const imgLoadError = () => {
+const imgLoadError = async () => {
   console.error("壁纸加载失败：", bgUrl.value);
   ElMessage({
     message: "壁纸加载失败，已临时切换回默认",
@@ -115,7 +162,12 @@ const imgLoadError = () => {
       fill: "#efefef",
     }),
   });
-  bgUrl.value = `/images/background${bgRandom}.jpg`;
+  if (key) {
+    const bgUrlS = `/images/background${bgRandom}.webp`;
+    bgUrl.value = await gasC(bgUrlS, key);
+  } else {
+    bgUrl.value = `/images/background${bgRandom}.webp`;
+  };
   if (store.webSpeech) {
     stopSpeech();
     const voice = import.meta.env.VITE_TTS_Voice;
@@ -127,48 +179,103 @@ const imgLoadError = () => {
 // 监听壁纸切换
 watch(
   () => store.coverType,
-  (value) => {
-    changeBg(value);
+  async (value) => {
+    await changeBg(Number(value));
   },
+  { immediate: true }
 );
 
-const SeasonStyle = async (type) => {
-  if (store.seasonalEffects) {
-    const month = new Date().getMonth() + 1; // 当前月份，1-12
-    if (type == 0) {
-      if (sest == 1) return;
-      if ([12, 1, 2].includes(month)) {
+const SeasonStyle = async (type, state, where) => {
+  const month = new Date().getMonth() + 1; // 当前月份，1-12
+  if (type == 0) {
+    if (sest == 1 && state == true && where == 'normal') return;
+    if ([12, 1, 2].includes(month)) {
+      if (state == true) {
         initSnowfall();
-      } else if ([1, 2].includes(month)) {
-        await import("@/utils/season/lantern");
-      } else if ([7, 8, 9].includes(month)) {
-        initFirefly();
+      } else if (state == false) {
+        closeSnowfall();
       } else {
         return;
       };
-    } else if (type == 1) {
-      initSnowfall();
-    } else if (type == 2) {
-      await import("@/utils/season/lantern");
-    } else if (type == 3) {
-      initFirefly();
+    } else if ([1, 2].includes(month)) {
+      if (state == true) {
+        initLantern();
+      } else if (state == false) {
+        closeLantern();
+      } else {
+        return;
+      };
+    } else if ([7, 8, 9].includes(month)) {
+      if (state == true) {
+        initFirefly();
+      } else if (state == false) {
+        closeFirefly();
+      } else {
+        return;
+      };
     } else {
       return;
     };
+  } else if (type == 1) {
+    if (state == true) {
+      initSnowfall();
+    } else if (state == false) {
+      closeSnowfall();
+    } else {
+      return;
+    };
+  } else if (type == 2) {
+    if (state == true) {
+      initLantern();
+    } else if (state == false) {
+      closeLantern();
+    } else {
+      return;
+    };
+  } else if (type == 3) {
+    if (state == true) {
+      initFirefly();
+    } else if (state == false) {
+      closeFirefly();
+    } else {
+      return;
+    };
+  } else {
+    return;
   };
   sest = 1;
 };
 
-
 onMounted(async () => {
   // 加载壁纸
-  changeBg(store.coverType);
+  await changeBg(Number(store.coverType));
   // 加载季节特效
-  SeasonStyle(0);
+  if (store.seasonalEffects) { await SeasonStyle(0, true, 'normal') } else { sest = 1 };
 });
 
 onBeforeUnmount(() => {
-  clearTimeout(imgTimeout.value);
+  if (imgTimeout.value) {
+    clearTimeout(imgTimeout.value);
+  };
+});
+
+watch(() => store.seasonalEffects, async (value) => {
+  if (sest == 0) return;
+  if (value) {
+    await SeasonStyle(0, true, 'userChange');
+  } else {
+    await SeasonStyle(0, false, 'userChange');
+    await SeasonStyle(1, false, 'userChange');
+    await SeasonStyle(2, false, 'userChange');
+    await SeasonStyle(3, false, 'userChange');
+  };
+});
+
+watch(() => store.sBGCount, async (value) => {
+  if (store.coverType != 0 || value == null || value == 0) return;
+  sBGCountN = value;
+  await changeBg(Number(store.coverType));
+  store.setSBGCount(null);
 });
 </script>
 

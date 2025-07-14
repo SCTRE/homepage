@@ -3,9 +3,9 @@
     <Transition name="fade" mode="out-in">
       <div v-if="!store.playerState || !store.playerLrcShow" class="power">
         <span>
-          <span :class="startYear < fullYear ? 'c-hidden' : 'hidden'">Copyright&nbsp;</span>
+          <span :class="ShowStartYear ? 'c-hidden' : 'hidden'">Copyright&nbsp;</span>
           &copy;
-          <span v-if="startYear < fullYear" class="site-start">
+          <span v-if="ShowStartYear" class="site-start">
             {{ startYear }}
             -
           </span>
@@ -32,9 +32,9 @@
       </div>
       <div v-else class="lrc" @dblclick="toggleForceIcon">
         <!-- 音乐进度条 -->
-        <ProgressBar v-if="store.footerProgressBar" :forceShowIcon="forceShowIcon" />
+        <ProgressBar v-if="store.footerProgressBar" />
         <Transition name="fade" mode="out-in" :id="`lrc-line-${store.playerLrc[0][2]}`"
-          v-if="!(!store.yrcEnable || store.yrcTemp.length == 0 || store.yrcLoading)">
+          v-if="!(!store.dwrcEnable || store.dwrcTemp.length == 0 || store.dwrcLoading)">
           <!-- &amp; -->
           <!-- 逐字模块山 -->
           <div class="lrc-all"
@@ -44,18 +44,18 @@
             <Icon size="20" style="transform: rotate(-18deg);" class="paws-1">
               <paw />
             </Icon>
-            <span class="yrc-box">
-              <span class="yrc-2 lrc-text text-hidden" id="yrc-2-wrap">
-                <span v-for="i in store.playerLrc" :key="`lrc-over-char-${i[2]}-${i[3]}`" v-html="i[4]">
+            <span class="dwrc-box">
+              <span class="dwrc-2 lrc-text text-hidden" id="dwrc-2-wrap">
+                <span v-for="(i, index) in store.playerLrc" :key="`lrc-over-char-${i[2]}-${i[3]}`" v-html="i[4]">
                 </span>
               </span>
-              <span class="yrc-1 lrc-text text-hidden" id="yrc-1-wrap">
-                <span v-for="i in store.playerLrc" :key="`lrc-char-${i[2]}-${i[3]}`" :class="[
-                  'yrc-char',
+              <span class="dwrc-1 lrc-text text-hidden" id="dwrc-1-wrap">
+                <span v-for="(i, index) in store.playerLrc" :key="`lrc-char-${i[2]}-${i[3]}`" :class="[
+                  'dwrc-char',
                   i[0] && Number(i[6]) > 0 ? 'fade-in' : 'fade-in-start',
                   i[0] && Number(i[5]) > 1019 && Number(i[6]) > 0 ? 'long-tone' : 'fade-in-start',
                   i[0] && Number(i[6]) <= 0 ? 'fade-out' : '',
-                  i[1] ? 'yrc-style-s2' : 'yrc-style-s1'
+                  i[1] ? 'dwrc-style-s2' : 'dwrc-style-s1'
                 ]" :id="`lrc-char-${i[2]}-${i[3]}`" v-html="i[4]">
                 </span>
               </span>
@@ -69,7 +69,8 @@
         </Transition>
         <Transition name="fade" mode="out-in" v-else>
           <!-- 逐行模块 -->
-          <div class="lrc-all" :key="store.getPlayerLrc">
+          <div class="lrc-all" :key="store.getPlayerLrc.length > 0 ?
+            `lrc-${store.getPlayerLrc[0][2]}-${store.getPlayerLrc.length}` : '歌词加载中...'">
             <music-one theme="filled" size="18" fill="#efefef" />
             &nbsp;
             <Icon size="20" style="transform: rotate(-18deg);" class="paws-3">
@@ -88,7 +89,7 @@
   </footer>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import ProgressBar from "@/components/ProgressBar.vue";
 import { Speech, stopSpeech, SpeechLocal } from "@/utils/speech";
 import { MusicOne } from "@icon-park/vue-next";
@@ -96,7 +97,7 @@ import { Icon } from "@vicons/utils";
 import { Paw } from "@vicons/ionicons5";
 import { mainStore } from "@/store";
 import config from "@/../package.json";
-import { ref, watch, computed, onMounted, nextTick, onBeforeUnmount } from "vue";
+import { ref, watch, computed, onMounted, nextTick, onUpdated, onBeforeUnmount } from "vue";
 import { throttle } from "lodash";
 
 const store = mainStore();
@@ -106,14 +107,16 @@ const scrollPosition = ref(0);
 const currentLine = ref(0);
 const audio = ref(null);
 const icon = ref(null);
-const forceShowIcon = ref(false);
 
 // 加载配置数据
 // const siteStartDate = ref(import.meta.env.VITE_SITE_START);
-const startYear = ref(
+const startYear = ref<number | null>(
   import.meta.env.VITE_SITE_START?.length >= 4 ?
-    import.meta.env.VITE_SITE_START.substring(0, 4) : null
+    parseInt(import.meta.env.VITE_SITE_START.substring(0, 4)) : null
 );
+const ShowStartYear = computed(() => {
+  return startYear.value !== null && startYear.value < fullYear;
+});
 const siteIcp = ref(import.meta.env.VITE_SITE_ICP);
 const siteMps = ref(import.meta.env.VITE_SITE_MPS);
 const siteAuthor = ref(import.meta.env.VITE_SITE_AUTHOR);
@@ -128,12 +131,12 @@ const siteUrl = computed(() => {
 });
 
 const toggleForceIcon = () => {
-  forceShowIcon.value = !forceShowIcon.value;
+  store.forceShowBarIcon = !store.forceShowBarIcon;
   ElMessage({
     dangerouslyUseHTMLString: true,
-    message: `${forceShowIcon.value ? '诶？' : '进度 ICON 常驻已禁用'}`,
+    message: `${store.forceShowBarIcon ? '诶？' : '进度 ICON 常驻已禁用'}`,
   });
-  if (forceShowIcon.value) {
+  if (store.forceShowBarIcon) {
     stopSpeech();
     const voice = import.meta.env.VITE_TTS_Voice;
     const vstyle = import.meta.env.VITE_TTS_Style;
@@ -146,34 +149,38 @@ const toggleForceIcon = () => {
   };
 };
 
-// yrc part
+// dwrc part
 watch(() => store.getPlayerLrc, (_new, _old) => {
-  const isLineByLine = !store.yrcEnable || store.yrcTemp.length == 0 || store.yrcLoading;
-  if (!store.playerYrcShowPro || isLineByLine) {
+  type DwrcItem = [number, number, any[]];
+  const isLineByLine = !store.dwrcEnable || (store.dwrcTemp as DwrcItem[]).length === 0 || store.dwrcLoading;
+  if (!store.playerDWRCShowPro || isLineByLine) {
     return;
   };
   const audio = document.querySelector('audio');
-  if (audio == undefined) {
+  if (!audio) {
     return;
   };
   const now = audio.currentTime * 1000;
-  const yrc2 = document.getElementsByClassName("yrc-box")[0];
-  if (yrc2 == undefined) {
+  const dwrc2 = document.getElementsByClassName("dwrc-box")[0] as HTMLElement;
+  if (!dwrc2 || dwrc2 == undefined) {
     return;
   };
-  const outputDom = yrc2.querySelectorAll("#yrc-2-wrap span");
-  const inputDom = yrc2.querySelectorAll("#yrc-1-wrap span");
+  const outputDom = dwrc2.querySelectorAll("#dwrc-2-wrap span");
+  const inputDom = dwrc2.querySelectorAll("#dwrc-1-wrap span");
   if (inputDom.length == 0 || outputDom.length == 0) {
     return;
   };
-  const yrcFiltered = store.yrcTemp.filter((i) => i[0] < now && now < i[0] + i[1]);
-  if (yrcFiltered.length == 0) {
+  const dwrcFiltered = (store.dwrcTemp as DwrcItem[]).filter(
+    (i) => i[0] < now && now < i[0] + i[1]
+  );
+  if (dwrcFiltered.length == 0) {
     return;
   };
-  const nowLine = yrcFiltered[yrcFiltered.length - 1][2];
+  const nowLine = dwrcFiltered[dwrcFiltered.length - 1][2];
   for (let i = 0; i < nowLine.length; i++) {
-    const [[start, duration], _a, _b, _c] = nowLine[i];
-    const inputItem = inputDom[i];
+    const item = nowLine[i] as [[number, number], any, any, any];
+    const [[start, duration], _a, _b, _c] = item;
+    const inputItem = inputDom[i] as HTMLElement;
     if (!inputItem || inputItem.hasAttribute('data-start')) {
       return;
     };
@@ -183,11 +190,11 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
       inputItem.removeAttribute('data-start');
       return;
     };
-    const outputItem = outputDom[i];
-    const animateOptions = {
+    const outputItem = outputDom[i] as HTMLElement;
+    const animateOptions: KeyframeAnimationOptions = {
       delay: Math.max(0, start - now),
       duration: duration,
-      fill: "forwards",
+      fill: "forwards" as FillMode,
       easing: "linear",
     };
     outputItem.style.transform = "translateY(-1px)";
@@ -212,7 +219,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
         }
       );
     };
-    inputItem.setAttribute("data-start", true);
+    inputItem.setAttribute("data-start", "true");
   };
 });
 
@@ -220,14 +227,16 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
 
 <style lang="scss" scoped>
 // 逐字模块1
-.yrc-char {
+.dwrc-char {
   display: inline-block;
   opacity: 0.6;
   -webkit-transform: translateY(1px);
   transform: translateY(1px);
   -webkit-background-clip: text;
   background-clip: text;
-  font-family: MiSans-Regular;
+  font-family: MiSans VF;
+  font-weight: 520;
+  font-size: 1.05rem;
   transition:
     opacity 0.3s linear,
     color 0.5s linear,
@@ -283,7 +292,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
       transform 0.3s linear;
   }
 
-  &.yrc-style-s1 {
+  &.dwrc-style-s1 {
     opacity: 0.6;
     color: rgba(220, 220, 220, 1);
     transition:
@@ -292,7 +301,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
       transform 0.3s linear;
   }
 
-  &.yrc-style-s2 {
+  &.dwrc-style-s2 {
     opacity: 1;
     color: rgba(255, 240, 245, 1);
     text-shadow: 0px 0px 6px rgba(255, 240, 245, 1),
@@ -354,8 +363,9 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
 }
 
 // 逐字模块2
-#yrc-2-wrap>span {
+#dwrc-2-wrap>span {
   display: inline-block;
+  transform: translateY(1px);
   white-space: nowrap;
   overflow: hidden;
   width: 0;
@@ -367,7 +377,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
     width 0.3s linear;
 }
 
-#yrc-2-wrap {
+#dwrc-2-wrap {
   display: inline-block;
   position: absolute;
   width: auto;
@@ -376,7 +386,9 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
   text-shadow: 0 0 6px rgba(0, 191, 255, 0.9),
     0px 0px 2px rgba(176, 224, 230, 0.9),
     0px 0px 2px rgba(230, 230, 250, 0.9);
-  font-family: MiSans-Regular;
+  font-family: MiSans VF;
+  font-weight: 520;
+  font-size: 1.05rem;
   overflow: hidden;
   white-space: nowrap;
   transition:
@@ -395,7 +407,9 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
   text-shadow: 0 0 6px rgba(255, 240, 245, 1),
     0 0 2px rgba(255, 165, 0, 1),
     0 0 2px rgba(255, 179, 71, 1);
-  font-family: MiSans-Regular;
+  font-family: MiSans VF;
+  font-weight: 520;
+  font-size: 1.05rem;
   transition:
     opacity 0.3s linear,
     color 0.5s linear;
@@ -412,7 +426,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
   line-height: 46px;
   text-align: center;
   z-index: 0;
-  font-size: 18px;
+  font-size: 1rem;
   // 文字不换行
   word-break: keep-all;
   white-space: nowrap;
@@ -448,7 +462,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
         display: inherit;
       }
 
-      .yrc-box {
+      .dwrc-box {
         justify-content: flex-start;
         position: relative;
         white-space: nowrap;
@@ -457,16 +471,16 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
         height: auto;
         z-index: 0;
 
-        .yrc-1,
-        .yrc-2 {
+        .dwrc-1,
+        .dwrc-2 {
           white-space: nowrap;
         }
 
-        .yrc-1 {
+        .dwrc-1 {
           z-index: 1;
         }
 
-        .yrc-2 {
+        .dwrc-2 {
           position: absolute;
           z-index: 1000;
         }
@@ -490,7 +504,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
       display: inline-block;
       padding: 0 10px;
       white-space: nowrap;
-      font-size: 18px;
+      font-size: 1.05rem;
       opacity: 0.6;
       transition: opacity 0.3s, color 0.3s;
     }
@@ -509,7 +523,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     background: rgb(0 0 0 / 25%);
-    font-size: 16px;
+    font-size: 1rem;
   }
 
   .fade-enter-active,
