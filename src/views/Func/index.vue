@@ -87,33 +87,40 @@ onBeforeUnmount(() => {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+
   &.mobile {
     .el-row {
       .el-col {
         &:nth-of-type(1) {
           display: contents;
         }
+
         &:nth-of-type(2) {
           display: none;
         }
       }
     }
   }
+
   .el-row {
     height: 100%;
     width: 100%;
     margin: 0 !important;
+
     .el-col {
       &:nth-of-type(1) {
         padding-left: 0 !important;
       }
+
       &:nth-of-type(2) {
         padding-right: 0 !important;
       }
+
       @media (max-width: 910px) {
         &:nth-of-type(1) {
           display: none;
         }
+
         &:nth-of-type(2) {
           padding: 0 !important;
           flex: none;
@@ -122,11 +129,13 @@ onBeforeUnmount(() => {
         }
       }
     }
+
     .left,
     .right {
       width: 100%;
       height: 100%;
     }
+
     .right {
       padding: 20px;
       display: flex;
@@ -134,30 +143,37 @@ onBeforeUnmount(() => {
       align-items: center;
       justify-content: space-between;
       animation: fade 0.5s;
+
       .time {
         font-size: 1.1rem;
         text-align: center;
+
         .date {
           text-overflow: ellipsis;
           overflow-x: hidden;
           white-space: nowrap;
         }
+
         .text {
           margin-top: 10px;
           font-size: 3.25rem;
           letter-spacing: 2px;
           font-family: "UnidreamLED";
         }
+
         @media (min-width: 1201px) and (max-width: 1280px) {
           font-size: 1rem;
         }
+
         @media (min-width: 911px) and (max-width: 992px) {
           font-size: 1rem;
+
           .text {
             font-size: 2.75rem;
           }
         }
       }
+
       .weather {
         text-align: center;
         width: 100%;

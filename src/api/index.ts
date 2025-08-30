@@ -30,22 +30,38 @@ const loadJSONP = (url, callbackName) => {
 
 // 获取音乐播放列表
 export const getPlayerList = async (server, type, id, serverse, idse) => {
-  let dataf: any[] = [];
+  let dataf: any[] = [], data3: any[] = [], data1: any[] = [], data2: any[] = [];
   if (serverse != null && idse != null) {
-    const res1 = await fetch(
-      `${import.meta.env.VITE_SONG_API}?server=${server}&type=${type}&id=${id}`,
-    );
-    const res2 = await fetch(
-      `${import.meta.env.VITE_SONG_API}?server=${serverse}&type=${type}&id=${idse}`,
-    );
-    const data1 = await res1.json();
-    const data2 = await res2.json();
-    dataf = [...data2, ...data1];
+    try {
+      const res1 = await fetch(
+        `${import.meta.env.VITE_SONG_API}?server=${server}&type=${type}&id=${id}`,
+      );
+      data1 = await res1.json();
+    } catch (e) {
+      data1 = [];
+      console.error("音乐源 1 请求失败:", e);
+    };
+    try {
+      const res2 = await fetch(
+        `${import.meta.env.VITE_SONG_API}?server=${serverse}&type=${type}&id=${idse}`,
+      );
+      data2 = await res2.json();
+    } catch (e) {
+      data2 = [];
+      console.error("音乐源 2 请求失败:", e);
+    };
+    dataf = [...data2 || [], ...data1 || []];
   } else {
-    const res = await fetch(
-      `${import.meta.env.VITE_SONG_API}?server=${server}&type=${type}&id=${id}`,
-    );
-    dataf = await res.json();
+    try {
+      const res1 = await fetch(
+        `${import.meta.env.VITE_SONG_API}?server=${server}&type=${type}&id=${id}`,
+      );
+      data3 = await res1.json();
+    } catch (e) {
+      data3 = [];
+      console.error("音乐源 1 请求失败:", e);
+    };
+    dataf = [...data3 || []];
   };
   const data = dataf;
   if (data.length > 0 && data[0]?.url?.startsWith("@")) {

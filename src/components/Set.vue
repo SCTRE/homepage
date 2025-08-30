@@ -11,7 +11,19 @@
           </el-radio-group>
         </div>
       </el-collapse-item>
-      <el-collapse-item title="个性化调整" name="2">
+      <el-collapse-item title="主题设置" name="2">
+        <div class="item">
+          <span class="text">主题模式</span><br><br>
+          <el-radio-group v-model="theme" size="small" text-color="#FFFFFF">
+            <el-radio value="system" border>跟随系统</el-radio>
+            <el-radio value="time" border>跟随时间</el-radio>
+            <el-radio value="bg" border>跟随背景</el-radio>
+            <el-radio value="light" border>浅色模式</el-radio>
+            <el-radio value="dark" border>深色模式</el-radio>
+          </el-radio-group>
+        </div>
+      </el-collapse-item>
+      <el-collapse-item title="个性化调整" name="3">
         <div class="item">
           <span class="text">建站日期显示</span>
           <el-switch v-model="siteStartShow" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
@@ -33,7 +45,7 @@
           <el-switch v-model="footerProgressBar" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
         </div>
       </el-collapse-item>
-      <el-collapse-item title="播放器配置" name="3">
+      <el-collapse-item title="播放器配置" name="4">
         <div class="item">
           <span class="text">自动播放</span>
           <el-switch v-model="playerAutoplay" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
@@ -52,7 +64,7 @@
           </el-radio-group>
         </div>
       </el-collapse-item>
-      <el-collapse-item title="歌词设置" name="4">
+      <el-collapse-item title="歌词设置" name="5">
         <div class="item">
           <span class="text">显示底栏歌词</span>
           <el-switch v-model="playerLrcShow" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
@@ -75,7 +87,7 @@
           <el-switch v-model="playerDWRCShowPro" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
         </div>
       </el-collapse-item>
-      <el-collapse-item title="语音设置" name="5">
+      <el-collapse-item title="语音设置" name="6">
         <div class="item">
           <span class="text">网页语音交互总开关</span>
           <el-switch v-model="webSpeech" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
@@ -85,10 +97,10 @@
           <el-switch v-model="playerSpeechName" inline-prompt :active-icon="CheckSmall" :inactive-icon="CloseSmall" />
         </div>
       </el-collapse-item>
-      <el-collapse-item title="其他设置" name="6">
-        <div>暂时没有其它啦qwq</div>
+      <el-collapse-item title="其他设置" name="7">
+        <div class="text">暂时没有其它啦qwq</div>
       </el-collapse-item>
-      <el-collapse-item v-if="setV" title="开发设置" name="7">
+      <el-collapse-item v-if="setV" title="开发设置" name="8">
         <DevSet />
       </el-collapse-item>
     </el-collapse>
@@ -97,7 +109,7 @@
 
 <script setup lang="ts">
 import { CheckSmall, CloseSmall, SuccessPicture } from "@icon-park/vue-next";
-import DevSet  from "@/components/DevSet.vue";
+import DevSet from "@/components/DevSet.vue";
 import { mainStore } from "@/store";
 import { storeToRefs } from "pinia";
 import config from "@/../package.json";
@@ -122,6 +134,8 @@ const {
   footerProgressBar,
   seasonalEffects,
   setV,
+  theme,
+  msgNameShow,
 } = storeToRefs(store);
 
 // 默认选中项
@@ -133,7 +147,7 @@ const radioChange = () => {
     message: "壁纸更换成功",
     icon: h(SuccessPicture, {
       theme: "filled",
-      fill: "#efefef",
+      fill: "var(--el-message-icon-color)",
     }),
   });
   if (store.webSpeech) {
@@ -147,15 +161,19 @@ const radioChange = () => {
 
 <style lang="scss" scoped>
 .setting {
+  .text {
+    color: var(--text-color);
+  }
+
   .collapse {
     border-radius: 8px;
-    --el-collapse-content-bg-color: #ffffff10;
+    --el-collapse-content-bg-color: var(--set-coll-background-ck-color);
     border-color: transparent;
     overflow: hidden;
 
     :deep(.el-collapse-item__header) {
-      background-color: #ffffff30;
-      color: #fff;
+      background-color: var(--set-coll-background-color);
+      color: var(--text-color);
       font-size: 15px;
       padding-left: 18px;
       border-color: transparent;
@@ -176,7 +194,7 @@ const radioChange = () => {
 
           .el-switch__core {
             border-color: transparent;
-            background-color: #ffffff30;
+            background-color: var(--set-radio-bg-ck-color);
           }
 
           .el-radio-group {
@@ -196,32 +214,32 @@ const radioChange = () => {
 
           .el-radio {
             margin: 10px 16px;
-            background: #ffffff26;
+            background: var(--set-radio-bg-color);
             border: 2px solid transparent;
             border-radius: 8px;
 
             .el-radio__label {
-              color: #fff;
+              color: var(--text-color);
             }
 
             .el-radio__inner {
-              background: #ffffff06 !important;
-              border: 2px solid #eeeeee !important;
+              background: var(--set-radio-bg-color) !important;
+              border: 2px solid var(--set-radio-border-color) !important;
             }
 
             &.is-checked {
-              background: #ffffff06 !important;
-              border: 2px solid #eeeeee !important;
+              background: var(--set-radio-bg-color) !important;
+              border: 2px solid var(--set-radio-border-color) !important;
             }
 
             .is-checked {
               .el-radio__inner {
-                background-color: #ffffff30 !important;
-                border-color: #fff !important;
+                background-color: var(--set-radio-bg-ck-color) !important;
+                border-color: var(--set-radio-border-ck-color) !important;
               }
 
               &+.el-radio__label {
-                color: #fff !important;
+                color: var(--text-color) !important;
               }
             }
           }

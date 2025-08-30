@@ -41,14 +41,22 @@ const store = mainStore();
 const siteLogo = import.meta.env.VITE_SITE_MAIN_LOGO;
 // 站点链接
 const siteUrl = computed(() => {
-  const url = import.meta.env.VITE_SITE_URL;
-  if (!url) return "imsyy.top".split(".");
-  // 判断协议前缀
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    const urlFormat = url.replace(/^(https?:\/\/)/, "");
-    return urlFormat.split(".");
+  let mns: string | null = null;
+  if (store.msgNameShow) {
+    mns = import.meta.env.VITE_SITE_MAIN_NAME  ||  import.meta.env.VITE_SITE_URL || "imsyy.top";
+    // 这里并没有处理显示自定义内容后的分段点，因为这个点看着也不错，有种写字时封笔的感觉，就不处理啦~
+    // 才不是懒的！（x）
+  } else {
+    mns = import.meta.env.VITE_SITE_URL || "imsyy.top";
   };
-  return url.split(".");
+  const url = mns;
+  if (!url) return "imsyy.top".split(".");
+  let urlFormat = url;
+  // 判断协议前缀
+  urlFormat = urlFormat.replace(/^(https?:\/\/)/, "");
+  const domainOnly = urlFormat.split('/')[0];
+  const hostname = domainOnly.split(':')[0];
+  return hostname.split(".");
 });
 
 // 简介区域文字
@@ -109,6 +117,7 @@ watch(
     align-items: center;
     animation: fade 0.5s;
     max-width: 460px;
+    color: rgba(245, 245, 245, 1);
 
     .logo-img {
       border-radius: 50%;
@@ -123,11 +132,13 @@ watch(
 
       .bg {
         font-size: 5rem;
+        color: rgba(245, 245, 245, 1);
       }
 
       .sm {
         margin-left: 6px;
         font-size: 2rem;
+        color: rgba(255, 240, 245, 1);
 
         @media (min-width: 721px) and (max-width: 789px) {
           display: none;

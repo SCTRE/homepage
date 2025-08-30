@@ -29,7 +29,19 @@
                     </el-form>
                 </div>
             </el-collapse-item>
-            <el-collapse-item title="检查版本更新" name="3">
+            <el-collapse-item title="个性化设置" name="3">
+                <div class="item">
+                    <span class="text">信息区域显示自定义名</span>
+                    <el-switch v-model="msgNameShow" inline-prompt :active-icon="CheckSmall"
+                        :inactive-icon="CloseSmall" />
+                </div>
+            </el-collapse-item>
+            <el-collapse-item title="重置" name="4">
+                <div class="item">
+                    <el-button plain class="el-button" @click="resetSettings()">重置所有设置</el-button>
+                </div>
+            </el-collapse-item>
+            <el-collapse-item title="检查版本更新" name="5">
                 <div class="item">
                     <div class="upver">版本号 v{{ versionInfo.version }}，{{ versTypeT }}，{{ versionInfo.channel }} 渠道，by {{
                         versionInfo.upa }} 。
@@ -75,10 +87,12 @@ const {
     footerProgressBar,
     seasonalEffects,
     setV,
+    theme,
+    msgNameShow,
 } = storeToRefs(store);
 
 const versionInfo = parseVersion(config.version);
-
+let chuores = 0;
 const versTypeT = computed(() => {
     switch (versionInfo.type) {
         case 'preview':
@@ -150,6 +164,39 @@ const form = reactive({
     wallpaperId: ''
 })
 
+const resetSettings = () => {
+    chuores = chuores + 1;
+    if (chuores === 3) {
+        ElMessage({
+            dangerouslyUseHTMLString: true,
+            message: `正在恢复默认配置，请稍后...`,
+        });
+        stopSpeech();
+        const voice = import.meta.env.VITE_TTS_Voice;
+        const vstyle = import.meta.env.VITE_TTS_Style;
+        SpeechLocal("重置2.mp3");
+        store.resetStore();
+    } else if (chuores > 3) {
+        ElMessage({
+            dangerouslyUseHTMLString: true,
+            message: `正在加载初始设置，请稍后...`,
+        });
+        stopSpeech();
+        const voice = import.meta.env.VITE_TTS_Voice;
+        const vstyle = import.meta.env.VITE_TTS_Style;
+        SpeechLocal("重置3.mp3");
+    } else {
+        ElMessage({
+            dangerouslyUseHTMLString: true,
+            message: `确定要重置所有设置吗？操作将在点击 3 次后执行。`,
+        });
+        stopSpeech();
+        const voice = import.meta.env.VITE_TTS_Voice;
+        const vstyle = import.meta.env.VITE_TTS_Style;
+        SpeechLocal("重置1.mp3");
+    };
+};
+
 const handleSetWallpaper = () => {
     if (store.coverType != 0) {
         ElMessage.error('当前使用非内置壁纸，不支持该功能！');
@@ -196,17 +243,21 @@ const handleSetWallpaper = () => {
 
 <style lang="scss" scoped>
 .devsettings {
+    .text {
+        color: var(--text-color);
+    }
+
     .collapse {
         border-radius: 8px;
-        --el-collapse-content-bg-color: #ffffff10;
+        --el-collapse-content-bg-color: var(--set-coll-background-ck-color);
         border-color: transparent;
         overflow: hidden;
 
         :deep(.el-collapse-item__header) {
-            background-color: #ffffff30;
-            color: #fff;
+            background-color: var(--set-coll-background-color);
+            color: var(--text-color);
             font-size: 15px;
-            padding-left: 18px;
+            padding-left: 15px;
             border-color: transparent;
         }
 
@@ -214,7 +265,7 @@ const handleSetWallpaper = () => {
             border-color: transparent;
 
             .el-collapse-item__content {
-                padding: 20px;
+                padding: 18px;
 
                 .item {
                     display: flex;
@@ -225,30 +276,36 @@ const handleSetWallpaper = () => {
 
                     .el-switch__core {
                         border-color: transparent;
-                        background-color: #ffffff30;
+                        background-color: var(--set-radio-bg-ck-color);
                     }
 
                     .el-button {
+                        margin: 8px 12px;
+                        border: 2px solid transparent;
+                        border-radius: 6px;
                         border-color: transparent;
-                        background-color: #ffffff30;
+                        background-color: var(--set-radio-bg-ck-color);
                         transition: all 0.1s ease;
                         position: relative;
                         overflow: hidden;
                         transform: scale(1);
+                        color: var(--text-color);
                     }
 
                     .el-button.active {
                         border-color: transparent;
-                        background-color: #ffffff30;
-                        border: 2px solid #eeeeee !important;
+                        background-color: var(--set-radio-bg-ck-color);
+                        border: 2px solid var(--set-radio-border-color) !important;
                         transition: all 0.1s ease;
                         position: relative;
                         overflow: hidden;
                         transform: scale(1);
+                        color: var(--text-color);
                     }
 
                     .el-button:active {
                         transform: scale(0.9);
+                        color: var(--text-color);
                         border: 1.5px solid rgba(176, 224, 230, 1) !important;
                     }
 
@@ -271,6 +328,7 @@ const handleSetWallpaper = () => {
                     .upver {
                         font-size: 0.75rem;
                         font-family: MiSans VF;
+                        color: var(--text-color);
                     }
                 }
 
@@ -279,32 +337,32 @@ const handleSetWallpaper = () => {
 
                     .el-radio {
                         margin: 10px 16px;
-                        background: #ffffff26;
+                        background: var(--set-radio-bg-color);
                         border: 2px solid transparent;
                         border-radius: 8px;
 
                         .el-radio__label {
-                            color: #fff;
+                            color: var(--text-color);
                         }
 
                         .el-radio__inner {
-                            background: #ffffff06 !important;
-                            border: 2px solid #eeeeee !important;
+                            background: var(--set-radio-bg-color) !important;
+                            border: 2px solid var(--set-radio-border-color) !important;
                         }
 
                         &.is-checked {
-                            background: #ffffff06 !important;
-                            border: 2px solid #eeeeee !important;
+                            background: var(--set-radio-bg-ck-color) !important;
+                            border: 2px solid var(--set-radio-border-color) !important;
                         }
 
                         .is-checked {
                             .el-radio__inner {
-                                background-color: #ffffff30 !important;
-                                border-color: #fff !important;
+                                background-color: var(--set-radio-bg-ck-color) !important;
+                                border-color: var(--set-radio-border-ck-color) !important;
                             }
 
                             &+.el-radio__label {
-                                color: #fff !important;
+                                color: var(--text-color) !important;
                             }
                         }
                     }

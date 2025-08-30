@@ -2,7 +2,7 @@
   <div class="mobileset" v-if="store.mobileOpenState" @mouseenter="closeShow = true" @mouseleave="closeShow = false"
     @click.stop>
     <transition name="el-fade-in-linear">
-      <close-one class="close" theme="filled" size="28" fill="#ffffff60" v-show="closeShow"
+      <close-one class="close" theme="filled" size="28" fill="var(--close-icon-color)"
         @click="store.setOpenState = false" />
     </transition>
     <el-row>
@@ -13,7 +13,7 @@
         </div>
         <!-- 移动端设置菜单 -->
         <div class="title">
-          <setting-two theme="filled" size="28" fill="#ffffff60" />
+          <setting-two theme="filled" size="28" fill="var(--text-color)" />
           <span class="name">全局设置</span>
         </div>
         <div class="mobileset-scrollable">
@@ -29,7 +29,7 @@
   </div>
   <div class="set" v-else @mouseenter="closeShow = true" @mouseleave="closeShow = false" @click.stop>
     <transition name="el-fade-in-linear">
-      <close-one class="close" theme="filled" size="28" fill="#ffffff60" v-show="closeShow"
+      <close-one class="close" theme="filled" size="28" fill="var(--close-icon-color)" v-show="closeShow"
         @click="store.setOpenState = false" />
     </transition>
     <el-row :gutter="40">
@@ -49,7 +49,7 @@
             <file-editing-one class="github" theme="outline" size="24" @click="jumpTo(config.efug)" />
           </el-tooltip>
         </div>
-        <el-card class="update">
+        <!-- <el-card class="update">
           <template #header>
             <div class="card-header">
               <span>更新日志</span>
@@ -65,15 +65,17 @@
               {{ item }}
             </div>
           </div>
-        </el-card>
+        </el-card> -->
       </el-col>
       <!-- 桌面端设置菜单 -->
       <el-col :span="12" class="right">
         <div class="title">
-          <setting-two theme="filled" size="28" fill="#ffffff60" />
+          <setting-two theme="filled" size="28" fill="var(--close-icon-color)" />
           <span class="name">全局设置</span>
         </div>
-        <Set />
+        <div class="set-scrollable">
+          <Set />
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -94,12 +96,12 @@ let chuover = 0;
 const siteUrl = computed(() => {
   const url = import.meta.env.VITE_SITE_URL;
   if (!url) return "imsyy.top".split(".");
+  let urlFormat = url;
   // 判断协议前缀
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    const urlFormat = url.replace(/^(https?:\/\/)/, "");
-    return urlFormat.split(".");
-  }
-  return url.split(".");
+  urlFormat = urlFormat.replace(/^(https?:\/\/)/, "");
+  const domainOnly = urlFormat.split('/')[0];
+  const hostname = domainOnly.split(':')[0];
+  return hostname.split(".");
 });
 
 // 更新日志
@@ -155,7 +157,7 @@ const jumpTo = (url) => {
   transform: translate(-50%, -50%);
   width: 80%;
   height: 80%;
-  background: rgb(255 255 255 / 40%);
+  background: var(--set-background-color);
   border-radius: 6px;
   padding: 40px;
 
@@ -231,8 +233,12 @@ const jumpTo = (url) => {
         align-items: center;
 
         .num {
-          font-size: 2rem;
+          font-size: 1rem;
           font-family: "Pacifico-Regular";
+        }
+
+        .el-popper {
+          background: linear-gradient(90deg, rgb(159, 229, 151), rgb(204, 229, 129));
         }
 
         .github {
@@ -300,6 +306,11 @@ const jumpTo = (url) => {
           margin-right: 6px;
         }
       }
+
+      .set-scrollable {
+        flex: 1;
+        overflow-y: auto;
+      }
     }
   }
 }
@@ -312,7 +323,7 @@ const jumpTo = (url) => {
   transform: translate(-50%, -50%);
   width: 82%;
   height: 86%;
-  background: rgb(255 255 255 / 40%);
+  background: var(--set-background-color);
   border-radius: 6px;
   padding: 36px;
 

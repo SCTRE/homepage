@@ -5,7 +5,7 @@
         class="close"
         theme="filled"
         size="28"
-        fill="#ffffff60"
+        fill="var(--close-icon-color)"
         v-show="closeShow"
         @click="store.boxOpenState = false"
       />
@@ -15,7 +15,7 @@
         class="setting"
         theme="filled"
         size="28"
-        fill="#ffffff60"
+        fill="var(--close-icon-color)"
         v-show="closeShow"
         @click="store.setOpenState = true"
       />
@@ -46,6 +46,7 @@ const closeShow = ref(false);
   max-width: 50%;
   position: relative;
   animation: fade 0.5s;
+  overflow: hidden;
 
   &:hover {
     transform: scale(1);
@@ -78,6 +79,7 @@ const closeShow = ref(false);
   .content {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     padding: 30px;
     width: 100%;
     height: 100%;

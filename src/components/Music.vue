@@ -7,37 +7,37 @@
     v-show="store.musicOpenState"
   >
     <div class="btns">
-      <span @click="openMusicList()">音乐列表</span>
+      <span @click="store.musicBoxOpenState = true">音乐列表</span>
       <span @click="store.musicOpenState = false">回到一言</span>
     </div>
     <div class="control">
-      <go-start theme="filled" size="30" fill="#efefef" @click="changeMusicIndex(0)" />
+      <go-start theme="filled" size="30" fill="var(--player-control-color)" @click="changeMusicIndex(0)" />
       <Transition name="fade" mode="out-in">
         <div :key="String(store.playerState)" class="state" @click="changePlayState">
-          <play-one theme="filled" size="50" fill="#efefef" v-show="!store.playerState" />
-          <pause theme="filled" size="50" fill="#efefef" v-show="store.playerState" />
+          <play-one theme="filled" size="50" fill="var(--player-control-color)" v-show="!store.playerState" />
+          <pause theme="filled" size="50" fill="var(--player-control-color)" v-show="store.playerState" />
         </div>
       </Transition>
-      <go-end theme="filled" size="30" fill="#efefef" @click="changeMusicIndex(1)" />
+      <go-end theme="filled" size="30" fill="var(--player-control-color)" @click="changeMusicIndex(1)" />
     </div>
     <div class="menu">
       <div class="name" v-show="!volumeShow">
         <span>{{
           store.getPlayerData.name
             ? store.getPlayerData.name + " - " + store.getPlayerData.artist
-            : "未播放音乐"
+            : "银趴未开始（？）"
         }}</span>
       </div>
       <div class="volume" v-show="volumeShow">
         <div class="icon">
-          <volume-mute theme="filled" size="24" fill="#efefef" v-if="volumeNum == 0" />
+          <volume-mute theme="filled" size="24" fill="var(--player-control-color)" v-if="volumeNum == 0" />
           <volume-small
             theme="filled"
             size="24"
-            fill="#efefef"
+            fill="var(--player-control-color)"
             v-else-if="volumeNum > 0 && volumeNum < 0.7"
           />
-          <volume-notice theme="filled" size="24" fill="#efefef" v-else />
+          <volume-notice theme="filled" size="24" fill="var(--player-control-color)" v-else />
         </div>
         <el-slider v-model="volumeNum" :show-tooltip="false" :min="0" :max="1" :step="0.01" />
       </div>
@@ -45,15 +45,15 @@
   </div>
   <!-- 音乐列表弹窗 -->
   <Transition name="fade" mode="out-in">
-    <div class="music-list" v-show="musicListShow" @click="closeMusicList()">
+    <div class="music-list" v-show="musicListShow" @click="store.musicBoxOpenState = false">
       <Transition name="zoom">
         <div class="list" v-show="musicListShow" @click.stop>
           <close-one
             class="close"
             theme="filled"
             size="28"
-            fill="#ffffff60"
-            @click="closeMusicList()"
+            fill="var(--close-icon-color)"
+            @click="store.musicBoxOpenState = false"
           />
           <Player
             ref="playerRef"
@@ -192,13 +192,24 @@ watch(
     playerRef.value!.changeVolume(store.musicVolume);
   },
 );
+
+watch(
+  () => store.musicBoxOpenState,
+  (value) => {
+    if (value) {
+      openMusicList();
+    } else {
+      closeMusicList();
+    };
+  },
+);
 </script>
 
 <style lang="scss" scoped>
 .music {
   width: 100%;
   height: 100%;
-  background: #00000040;
+  background: var(--card-background-color);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-radius: 6px;
@@ -213,7 +224,7 @@ watch(
     align-items: center;
     margin-bottom: 6px;
     span {
-      background: #ffffff26;
+      background: var(--music-smcard-background-color);
       padding: 2px 8px;
       border-radius: 6px;
       margin: 0px 6px;
@@ -221,7 +232,7 @@ watch(
       overflow-x: hidden;
       white-space: nowrap;
       &:hover {
-        background: #ffffff4d;
+        background: var(--music-smcard-background-hover-color);
       }
     }
   }
@@ -249,7 +260,7 @@ watch(
       border-radius: 6px;
       transform: scale(1);
       &:hover {
-        background: #ffffff33;
+        background: var(--player-control-hover-bg-color);
       }
       &:active {
         transform: scale(0.95);
@@ -295,8 +306,8 @@ watch(
       }
       .el-slider {
         margin-right: 12px;
-        --el-slider-main-bg-color: #efefef;
-        --el-slider-runway-bg-color: #ffffff40;
+        --el-slider-main-bg-color: var(--player-slider-main-color);
+        --el-slider-runway-bg-color: var(--player-slider-runway-color);
         --el-slider-button-size: 16px;
       }
     }
@@ -309,11 +320,13 @@ watch(
   margin: auto;
   width: 100%;
   height: 100%;
-  background-color: #00000080;
+  background-color: var(--music-player-background-color);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   z-index: 1;
+  color: var(--text-color);
   .list {
+    color: var(--text-color);
     position: absolute;
     display: flex;
     align-items: center;
@@ -322,7 +335,7 @@ watch(
     left: calc(50% - 320px);
     width: 640px;
     height: 600px;
-    background-color: #ffffff66;
+    background-color: var(--music-card-background-color);
     border-radius: 6px;
     z-index: 999;
     @media (max-width: 720px) {

@@ -19,15 +19,27 @@
             {{ config.author }}
           </a>
         </span>
+        <span class="hidden">
+          &amp;&nbsp;Update&nbsp;by
+          <a :href="config.efug" target="_blank">
+            {{ config.efua }}
+          </a>
+        </span>
         <!-- 站点备案 -->
         <span>
-          <a v-if="siteIcp" href="https://beian.miit.gov.cn" target="_blank">
-            &amp;&nbsp;{{ siteIcp }}
-          </a>
+          <span v-if="siteIcp">
+            &amp;&nbsp;
+            <a v-if="siteIcp" href="https://beian.miit.gov.cn" target="_blank">
+              {{ siteIcp }}
+            </a>
+          </span>
           <!-- 这备那备的真的很扫（bushi） -->
-          <a v-if="siteMps" href="https://beian.mps.gov.cn" target="_blank">
-            &amp;&nbsp;{{ siteMps }}
-          </a>
+          <span v-if="siteMps">
+            &amp;&nbsp;
+            <a v-if="siteMps" href="https://beian.mps.gov.cn" target="_blank">
+              {{ siteMps }}
+            </a>
+          </span>
         </span>
       </div>
       <div v-else class="lrc" @dblclick="toggleForceIcon">
@@ -38,10 +50,11 @@
           <!-- &amp; -->
           <!-- 逐字模块山 -->
           <div class="lrc-all"
-            :key="store.playerLrc.length != 0 ? `lrc-line-${store.playerLrc[0][2]}` : `lrc-line-null`">
-            <music-one theme="filled" size="18" fill="#efefef" />
+            :key="store.playerLrc.length != 0 ? `lrc-line-${store.playerLrc[0][2]}-${store.lyricSeekVersion}` : `lrc-line-null`">
+            <music-one theme="filled" size="18" fill="var(--footer-music-icon-color)" />
             &nbsp;
-            <Icon size="20" style="transform: rotate(-18deg);" class="paws-1">
+            <Icon size="20" style="transform: rotate(-18deg);" class="paws-1"
+              color="var(--footer-music-paw-icon-color)">
               <paw />
             </Icon>
             <span class="dwrc-box">
@@ -60,28 +73,29 @@
                 </span>
               </span>
             </span>
-            <Icon size="20" style="transform: rotate(18deg);" class="paws-2">
+            <Icon size="20" style="transform: rotate(18deg);" class="paws-2" color="var(--footer-music-paw-icon-color)">
               <paw />
             </Icon>
             &nbsp;
-            <music-one theme="filled" size="18" fill="#efefef" />
+            <music-one theme="filled" size="18" fill="var(--footer-music-icon-color)" />
           </div>
         </Transition>
         <Transition name="fade" mode="out-in" v-else>
           <!-- 逐行模块 -->
           <div class="lrc-all" :key="store.getPlayerLrc.length > 0 ?
             `lrc-${store.getPlayerLrc[0][2]}-${store.getPlayerLrc.length}` : '歌词加载中...'">
-            <music-one theme="filled" size="18" fill="#efefef" />
+            <music-one theme="filled" size="18" fill="var(--footer-music-icon-color)" />
             &nbsp;
-            <Icon size="20" style="transform: rotate(-18deg);" class="paws-3">
+            <Icon size="20" style="transform: rotate(-18deg);" class="paws-3"
+              color="var(--footer-music-paw-icon-color)">
               <paw />
             </Icon>
             <span class="lrc-text text-hidden" v-html="store.getPlayerLrc[0][4]" :class="`lrc-char`" />
-            <Icon size="20" style="transform: rotate(18deg);" class="paws-4">
+            <Icon size="20" style="transform: rotate(18deg);" class="paws-4" color="var(--footer-music-paw-icon-color)">
               <paw />
             </Icon>
             &nbsp;
-            <music-one theme="filled" size="18" fill="#efefef" />
+            <music-one theme="filled" size="18" fill="var(--footer-music-icon-color)" />
           </div>
         </Transition>
       </div>
@@ -119,15 +133,23 @@ const ShowStartYear = computed(() => {
 });
 const siteIcp = ref(import.meta.env.VITE_SITE_ICP);
 const siteMps = ref(import.meta.env.VITE_SITE_MPS);
+const siteMICP = ref(import.meta.env.VITE_SITE_MICP);
 const siteAuthor = ref(import.meta.env.VITE_SITE_AUTHOR);
+
 const siteUrl = computed(() => {
   const url = import.meta.env.VITE_SITE_URL;
-  if (!url) return "https://www.imsyy.top";
-  // 判断协议前缀
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    return "//" + url;
+  if (!url) return "https://www.imsyy.top/";
+  let fullUrl = url;
+  if (!/^https?:\/\//i.test(url)) {
+    fullUrl = "https://" + url;
   };
-  return url;
+  fullUrl = fullUrl.replace(/^http:\/\//i, 'https://');
+  try {
+    const urlObj = new URL(fullUrl);
+    return urlObj.toString();
+  } catch (e) {
+    return "https://www.imsyy.top/";
+  };
 });
 
 const toggleForceIcon = () => {
@@ -182,13 +204,13 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
     const [[start, duration], _a, _b, _c] = item;
     const inputItem = inputDom[i] as HTMLElement;
     if (!inputItem || inputItem.hasAttribute('data-start')) {
-      return;
+      continue;
     };
     const computedStyle = window.getComputedStyle(inputItem);
     const width = parseFloat(computedStyle.width);
     if (isNaN(width)) {
       inputItem.removeAttribute('data-start');
-      return;
+      continue;
     };
     const outputItem = outputDom[i] as HTMLElement;
     const animateOptions: KeyframeAnimationOptions = {
@@ -243,7 +265,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
     transform 0.3s linear;
 
   &.fade-in-start {
-    text-shadow: 0px 0px 2px rgba(255, 240, 245, 1);
+    text-shadow: 0px 0px 2px var(--footer-dwrc-shadow-first-color);
     opacity: 0.6; // 初始显示的透明度
     -webkit-transform: translateY(1px);
     transform: translateY(1px);
@@ -268,7 +290,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
     opacity: 1;
     -webkit-transform: translateY(-1px);
     transform: translateY(-1px);
-    text-shadow: 0px 0px 6px rgba(255, 240, 245, 1),
+    text-shadow: 0px 0px 6px var(--footer-dwrc-shadow-first-color),
       0px 0px 2px rgba(176, 224, 230, 1),
       0px 0px 2px rgba(230, 230, 250, 1);
     transition:
@@ -294,7 +316,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
 
   &.dwrc-style-s1 {
     opacity: 0.6;
-    color: rgba(220, 220, 220, 1);
+    color: var(--footer-dwrc-start-color);
     transition:
       color 0.5s linear,
       opacity 0.3s linear,
@@ -303,8 +325,8 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
 
   &.dwrc-style-s2 {
     opacity: 1;
-    color: rgba(255, 240, 245, 1);
-    text-shadow: 0px 0px 6px rgba(255, 240, 245, 1),
+    color: var(--footer-dwrc-end-color);
+    text-shadow: 0px 0px 6px var(--footer-dwrc-shadow-first-color),
       0px 0px 2px rgba(176, 224, 230, 1),
       0px 0px 2px rgba(230, 230, 250, 1);
     transition:
@@ -328,17 +350,17 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
 
 @keyframes colorFade {
   from {
-    color: rgba(220, 220, 220, 1);
+    color: var(--footer-dwrc-start-color);
     opacity: 0.6;
-    text-shadow: 0px 0px 3px rgba(255, 240, 245, 1),
+    text-shadow: 0px 0px 3px var(--footer-dwrc-shadow-first-color),
       0px 0px 0px rgba(176, 224, 230, 1),
       0px 0px 0px rgba(230, 230, 250, 1);
   }
 
   to {
-    color: rgba(255, 240, 245, 1);
+    color: var(--footer-dwrc-end-color);
     opacity: 1;
-    text-shadow: 0px 0px 6px rgba(255, 240, 245, 1),
+    text-shadow: 0px 0px 6px var(--footer-dwrc-shadow-first-color),
       0px 0px 2px rgba(176, 224, 230, 1),
       0px 0px 2px rgba(230, 230, 250, 1);
   }
@@ -346,19 +368,31 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
 
 @keyframes pulse {
   from {
-    color: rgba(220, 220, 220, 1);
+    color: var(--footer-dwrc-start-color);
     opacity: 0.6;
-    text-shadow: 0px 0px 3px rgba(255, 240, 245, 1),
+    text-shadow: 0px 0px 3px var(--footer-dwrc-shadow-first-color),
+      0px 0px 0px rgba(255, 182, 193, 0.3),
+      0px 0px 0px rgba(255, 192, 203, 0.3),
+      0px 0px 0px rgba(255, 182, 193, 0.3),
+      0px 0px 0px rgba(255, 192, 203, 0.3),
+      0px 0px 0px rgba(255, 182, 193, 1),
+      0px 0px 0px rgba(255, 192, 203, 1),
       0px 0px 0px rgba(255, 182, 193, 1),
       0px 0px 0px rgba(255, 192, 203, 1);
   }
 
   to {
-    color: rgba(255, 240, 245, 1);
+    color: var(--footer-dwrc-end-color);
     opacity: 1;
-    text-shadow: 3px 3px 7px rgba(255, 240, 245, 1),
+    text-shadow: 3px 3px 7px var(--footer-dwrc-shadow-first-color),
+      0px 0px 4px rgba(255, 182, 193, 0.3),
+      0px 0px 4px rgba(255, 192, 203, 0.3),
+      0px 0px 8px rgba(255, 182, 193, 0.3),
+      0px 0px 8px rgba(255, 192, 203, 0.3),
       0px 0px 12px rgba(255, 182, 193, 1),
-      0px 0px 12px rgba(255, 192, 203, 1);
+      0px 0px 12px rgba(255, 192, 203, 1),
+      0px 0px 16px rgba(255, 182, 193, 1),
+      0px 0px 16px rgba(255, 192, 203, 1);
   }
 }
 
@@ -382,10 +416,10 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
   position: absolute;
   width: auto;
   opacity: 0.8;
-  color: rgba(255, 240, 245, 0.3);
-  text-shadow: 0 0 6px rgba(0, 191, 255, 0.9),
-    0px 0px 2px rgba(176, 224, 230, 0.9),
-    0px 0px 2px rgba(230, 230, 250, 0.9);
+  color: var(--footer-dwrc-two-color);
+  text-shadow: 0 0 6px rgba(0, 191, 255, 0.8),
+    0px 0px 2px rgba(176, 224, 230, 0.8),
+    0px 0px 2px rgba(230, 230, 250, 0.8);
   font-family: MiSans VF;
   font-weight: 520;
   font-size: 1.05rem;
@@ -404,7 +438,8 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
   opacity: 1;
   -webkit-background-clip: text;
   background-clip: text;
-  text-shadow: 0 0 6px rgba(255, 240, 245, 1),
+  color: var(--footer-dwrc-end-color);
+  text-shadow: 0 0 6px var(--footer-dwrc-shadow-first-color),
     0 0 2px rgba(255, 165, 0, 1),
     0 0 2px rgba(255, 179, 71, 1);
   font-family: MiSans VF;
@@ -430,6 +465,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
   // 文字不换行
   word-break: keep-all;
   white-space: nowrap;
+  color: var(--footer-font-color);
 
   .power {
     animation: fade 0.3s;
@@ -522,7 +558,7 @@ watch(() => store.getPlayerLrc, (_new, _old) => {
   &.blur {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    background: rgb(0 0 0 / 25%);
+    background: var(--footer-background-color);
     font-size: 1rem;
   }
 
