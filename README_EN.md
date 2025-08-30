@@ -12,7 +12,9 @@ English | [简体中文](./README.md)
 <strong><h2>Homepage</h2></strong>
 </p>
 
-![Homepage](/screenshots/main.png)
+![Homepage](/screenshots/main.png)<p>
+![Homepage](/screenshots/main1.png)<p>
+![Homepage](/screenshots/main2.png)<p>
 
 ### 👀Demo
 
