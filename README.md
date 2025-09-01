@@ -9,6 +9,28 @@
 >### 最后，喜欢本项目的话麻烦给个 STAR ！阿里嘎多~
 
 <p>&nbsp;<p>
+
+> [!WARNING]
+> ## 关于 PWA 缓存的问题
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;由于 PWA 依赖的 Workbox 组件已经<b>长达 1 年</b>没有发布新 Release ，导致 Workbox 仍在使用已经被弃用的 glob 版本 7.2.3 。这个问题造成项目在运行时提示包含弃用的依赖。 <p>
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;<b>So Google , fuck you !</b><p>
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;目前项目放弃对 PWA 缓存的支持，强制将 glob 覆盖到高版本。故编译时会得到错误 ：<p>
+> ```bash
+> PWA v1.0.3
+>mode      generateSW
+>precache  8 entries (0.00 KiB)
+>files generated
+>  dist/sw.js
+>  dist/workbox-4523edd1.js
+>warnings
+>  An error occurred when globbing for files. 'Cannot read properties of undefined (reading 'sync')'
+>
+>✓ built in 13.21s
+> ```
+> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;但除了缓存外并不会导致项目出现其它异常。如果需要启用这个功能，请删除 `package.json` 内`overrides`中的`"glob": "^11.0.3"`，然后重新执行`pnpm install`。此功能应该会恢复正常，<p>
+>### So Google , fuck you !
+
+<p>&nbsp;<p>
 <strong><h2>無名の主页</h2></strong>
 </p>
 
